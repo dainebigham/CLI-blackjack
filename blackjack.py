@@ -38,15 +38,19 @@ class Deck:
 
     def deal(self):
         single_card = self.cards.pop()
-        return single_card
+        card_value = single_card.value
+        return single_card, card_value
 
 class Player:
     def __init__(self, name):
         self.name = name
+        self.value = 0
         self.hand = []
 
     def draw(self, deck):
-        self.hand.append(deck.deal())
+        result = deck.deal()
+        self.hand.append(result[0])
+        self.value += result[1]
         return self
 
     def dealer_hand(self):
@@ -74,29 +78,78 @@ class Credits:
     def lose(self):
         self.total -= self.bet
 
+playing = True
+
 def main(): 
 
-    # print("Welcome to Blackjack")
-    # print(f"Credits: ${credits}")
-    
-    # bet = input("Enter bet: ")
-    
-    # input("Hit ENTER to deal")
+    print("Welcome to Blackjack ♡ ♧ ♢ ♤\nGet as close as you can to 21 without going over.")
+    print("House Rules:\n 1. Aces are 1 or 11\n 2. ")
 
     deck = Deck()
     deck.shuffle()
-    # deck.show()
-    
 
     dealer = Player("Dealer")
     dealer.draw(deck), dealer.draw(deck)
+    player = Player("Player")
+    player.draw(deck), player.draw(deck)
+
+    credits = Credits()
+    bet(credits)
+
+    show_cards(dealer, player)
+
+    while playing:
+        hit_stand(player, deck)
+
+        show_cards(dealer, player)
+
+        if player.value > 21:
+            print("Player busts!")
+            credits.lose()
+            break
+        
+    if player.value <= 21:
+        while dealer.value < 21:
+            dealer.draw(deck)
+
+    show_cards(dealer, player)
+
+    if dealer.value > 21:
+        print("Dealer busts!")
+        credits.win()
+    elif dealer.value > player.value:
+        print("Dealer wins!")
+        credits.lose()
+    elif player.value > dealer.value:
+        print("Player wins!")
+        credits.win()
+    else:
+        print("Push! Dealer and player tie.")
+
+def show_cards(dealer, player):
+    print("Dealer: ")
     dealer.dealer_hand()
+    print("")
+    print("Player: ")
+    player.player_hand()
 
-    # # bob = Player("Player")
-    # # bob.draw(deck), bob.draw(deck)
-    # # bob.show_hand()
+def hit_stand(player, deck):
+    global playing
 
-def take_bet(credits):
+    while True:
+        move = input("(H)it or (S)tand? ").lower()
+
+        if move == 'h' or move == 'hit':
+            player.draw(deck)
+        elif move == 's' or move == 'stand':
+            print("Player stands, dealer is still playing.")
+            playing = False
+        else:
+            print("Sorry, try again.")
+            continue
+        break
+
+def bet(credits):
     while True:
         try:
             credits.bet = int(input("How much would you like to bet? "))
