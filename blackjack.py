@@ -1,3 +1,4 @@
+
 import os
 import random
 
@@ -89,7 +90,6 @@ playing = True
 
 def main(): 
     global playing
-    final = False
 
     clear()
     print("Welcome to Blackjack ♡ ♧ ♢ ♤\nGet as close as you can to 21 without going over.")
@@ -101,6 +101,7 @@ def main():
     credits = Credits()
 
     while True:
+        final = False
         dealer = Player("Dealer")
         dealer.draw(deck), dealer.draw(deck)
         player = Player("Player")
@@ -119,8 +120,11 @@ def main():
                 print("Player busts!")
                 credits.lose()
                 break
+            elif player.value == 21:
+                print("Player wins!")
+                credits.win()
             
-        if player.value <= 21:
+        if player.value < 21:
             while dealer.value < 18:
                 dealer.draw(deck)
 
@@ -135,6 +139,9 @@ def main():
         elif dealer.value > player.value:
             print("Dealer wins!")
             credits.lose()
+        elif dealer.value < player.value and player.value < 21:
+            print("Player wins!")
+            credits.win()
         elif dealer.value == player.value:
             print("Push! Dealer and player tie.")
 
