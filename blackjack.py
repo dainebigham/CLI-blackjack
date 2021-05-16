@@ -123,6 +123,7 @@ def main():
             elif player.value == 21:
                 print("Player wins!")
                 credits.win()
+                break
             
         if player.value < 21:
             while dealer.value < 18:
