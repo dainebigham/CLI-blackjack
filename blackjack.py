@@ -147,7 +147,11 @@ def main():
 
         print(f"Player winnings: {credits.total}")
 
-        new_game = input("Would you like to play again? (y/n)").lower()
+        if credits.total > 0:
+            new_game = input("Would you like to play again? (y/n)").lower()
+        else:
+            print("You are out of credits. Thanks for playing.")
+            break
 
         if new_game == 'y' or new_game == 'yes':
             clear()
