@@ -1,4 +1,4 @@
-
+import os
 import random
 
 class Card:
@@ -8,7 +8,7 @@ class Card:
         self.value = value
     
     def show(self):
-        print("{} {}".format(self.rank, self.suit))
+        print("{} {} {}".format(self.rank, self.suit, self.value))
 
 class Deck:
     def __init__(self):
@@ -19,7 +19,7 @@ class Deck:
         for s in ['♡', '♧', '♢', '♤']:
             for r in range(1, 14):
                 if r == 1:
-                    self.cards.append(Card(s, 'A', [1, 11]))
+                    self.cards.append(Card(s, 'A', 11))
                 elif r == 11:
                     self.cards.append(Card(s, 'J', 10))
                 elif r == 12:
@@ -39,7 +39,8 @@ class Deck:
     def deal(self):
         single_card = self.cards.pop()
         card_value = single_card.value
-        return single_card, card_value
+        card_rank = single_card.rank
+        return single_card, card_value, card_rank
 
 class Player:
     def __init__(self, name):
@@ -47,10 +48,19 @@ class Player:
         self.value = 0
         self.hand = []
 
+    def reset(self):
+        self.value = 0
+        self.hand = []
+
     def draw(self, deck):
         result = deck.deal()
         self.hand.append(result[0])
-        self.value += result[1]
+        if result[2] == 'A':
+            if self.value + result[1] > 21:
+                self.value += 1
+        else:
+            self.value += result[1]
+
         return self
 
     def dealer_hand(self):
@@ -63,9 +73,6 @@ class Player:
     def player_hand(self):
         for card in self.hand:
             card.show()
-
-    def ace(self):
-        pass
 
 class Credits:
     def __init__(self):
@@ -81,56 +88,80 @@ class Credits:
 playing = True
 
 def main(): 
+    global playing
+    final = False
 
+    clear()
     print("Welcome to Blackjack ♡ ♧ ♢ ♤\nGet as close as you can to 21 without going over.")
-    print("House Rules:\n 1. Aces are 1 or 11\n 2. ")
+    print("House Rules:\n 1. Aces are 1 or 11\n 2. Dealer draws until 18\n 3. Start with 2000 credits")
 
     deck = Deck()
     deck.shuffle()
 
-    dealer = Player("Dealer")
-    dealer.draw(deck), dealer.draw(deck)
-    player = Player("Player")
-    player.draw(deck), player.draw(deck)
-
     credits = Credits()
-    bet(credits)
 
-    show_cards(dealer, player)
+    while True:
+        dealer = Player("Dealer")
+        dealer.draw(deck), dealer.draw(deck)
+        player = Player("Player")
+        player.draw(deck), player.draw(deck)
 
-    while playing:
-        hit_stand(player, deck)
+        bet(credits)
 
-        show_cards(dealer, player)
+        show_cards(dealer, player, final)
 
-        if player.value > 21:
-            print("Player busts!")
+        while playing:
+            hit_stand(player, deck)
+
+            show_cards(dealer, player, final)
+
+            if player.value > 21:
+                print("Player busts!")
+                credits.lose()
+                break
+            
+        if player.value <= 21:
+            while dealer.value < 18:
+                dealer.draw(deck)
+
+                if dealer.value > 18:
+                    final = True
+
+                show_cards(dealer, player, final)
+
+        if dealer.value > 21:
+            print("Dealer busts!")
+            credits.win()
+        elif dealer.value > player.value:
+            print("Dealer wins!")
             credits.lose()
+        elif dealer.value == player.value:
+            print("Push! Dealer and player tie.")
+
+        print(f"Player winnings: {credits.total}")
+
+        new_game = input("Would you like to play again? (y/n)").lower()
+
+        if new_game == 'y' or new_game == 'yes':
+            clear()
+            playing = True
+            continue
+        else:
+            print("Thanks for playing.")
             break
-        
-    if player.value <= 21:
-        while dealer.value < 21:
-            dealer.draw(deck)
 
-    show_cards(dealer, player)
-
-    if dealer.value > 21:
-        print("Dealer busts!")
-        credits.win()
-    elif dealer.value > player.value:
-        print("Dealer wins!")
-        credits.lose()
-    elif player.value > dealer.value:
-        print("Player wins!")
-        credits.win()
-    else:
-        print("Push! Dealer and player tie.")
-
-def show_cards(dealer, player):
+def show_cards(dealer, player, final):
+    clear()
+    print(credits)
     print("Dealer: ")
-    dealer.dealer_hand()
+    print(dealer.value)
+    if final == True: 
+        dealer.player_hand()
+    else:
+        dealer.dealer_hand()
     print("")
     print("Player: ")
+    print(player.value)
     player.player_hand()
 
 def hit_stand(player, deck):
@@ -160,5 +191,8 @@ def bet(credits):
                 print("Sorry, you do not have enough credits to make this bet")
             else:
                 break
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
     
 main()
