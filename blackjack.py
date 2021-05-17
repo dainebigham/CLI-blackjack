@@ -9,7 +9,7 @@ class Card:
         self.value = value
     
     def show(self):
-        print("{} {} {}".format(self.rank, self.suit, self.value))
+        print("{} {}".format(self.rank, self.suit))
 
 class Deck:
     def __init__(self):
@@ -93,7 +93,7 @@ def main():
 
     clear()
     print("Welcome to Blackjack ♡ ♧ ♢ ♤\nGet as close as you can to 21 without going over.")
-    print("House Rules:\n 1. Aces are 1 or 11\n 2. Dealer draws until 18\n 3. Start with 2000 credits")
+    print("House Rules:\n 1. Aces are 1 or 11\n 2. Dealer draws until 18\n 3. Player starts with 2000 credits")
 
     deck = Deck()
     deck.shuffle()
@@ -117,10 +117,14 @@ def main():
             show_cards(dealer, player, final)
 
             if player.value > 21:
+                final = True
+                show_cards(dealer, player, final)
                 print("Player busts!")
                 credits.lose()
                 break
             elif player.value == 21:
+                final = True
+                show_cards(dealer, player, final)
                 print("Player wins!")
                 credits.win()
                 break
@@ -164,16 +168,13 @@ def main():
 
 def show_cards(dealer, player, final):
     clear()
-    print(credits)
     print("Dealer: ")
-    print(dealer.value)
     if final == True: 
         dealer.player_hand()
     else:
         dealer.dealer_hand()
     print("")
     print("Player: ")
-    print(player.value)
     player.player_hand()
 
 def hit_stand(player, deck):
