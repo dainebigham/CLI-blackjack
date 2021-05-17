@@ -207,15 +207,6 @@ def bet(credits):
             else:
                 break
 
-def player_win():
-    pass
-
-def dealer_win():
-    pass
-
-def push():
-    pass
-
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
     
