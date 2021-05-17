@@ -59,6 +59,8 @@ class Player:
         if result[2] == 'A':
             if self.value + result[1] > 21:
                 self.value += 1
+            else:
+                self.value += result[1]
         else:
             self.value += result[1]
 
@@ -204,6 +206,15 @@ def bet(credits):
                 print("Sorry, you do not have enough credits to make this bet")
             else:
                 break
+
+def player_win():
+    pass
+
+def dealer_win():
+    pass
+
+def push():
+    pass
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
